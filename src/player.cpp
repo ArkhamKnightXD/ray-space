@@ -3,10 +3,17 @@
 
 Player::Player(float positionX, float positionY)
 {
-    bounds = Rectangle{positionX, positionY, 64, 16};
+    sprite = LoadTexture("assets/sprites/spaceship.png");
+    bounds = Rectangle{positionX, positionY, (float)sprite.width, (float)sprite.height};
+    
     speed = 600;
     score = 0;
-    lives = 2;
+    lives = 2;    
+}
+
+Player::~Player()
+{
+    UnloadTexture(sprite);
 }
 
 void Player::Update(float deltaTime)
@@ -20,5 +27,5 @@ void Player::Update(float deltaTime)
 
 void Player::Draw()
 {
-    DrawRectangleRounded(bounds, 0.8, 0, WHITE);
+    DrawTexture(sprite, bounds.x, bounds.y, WHITE);
 }

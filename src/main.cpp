@@ -1,6 +1,7 @@
 #include <raylib.h>
 #include "player.h"
 #include "alien.h"
+#include "structure.h"
 #include <vector>
 #include <stdio.h>
 #include <stdio.h>
@@ -37,6 +38,11 @@ int main()
 
     InitWindow(screenWidth, screenHeight, "Breakout!");
     SetTargetFPS(144);
+
+    Structure structure = Structure(screenWidth / 2 -300, 550);
+    Structure structure2 = Structure(screenWidth / 2 -125, 550);
+    Structure structure3 = Structure(screenWidth / 2 +50, 550);
+    Structure structure4 = Structure(screenWidth / 2 +250, 550);
 
     Player player = Player(screenWidth / 2, screenHeight - 44);
 
@@ -76,6 +82,11 @@ int main()
             {
                 alien.Draw();
             }
+
+            structure.Draw();
+            structure2.Draw();
+            structure3.Draw();
+            structure4.Draw();
 
             player.Draw();
 

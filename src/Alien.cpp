@@ -1,5 +1,4 @@
 #include "alien.h"
-#include <raylib.h>
 
 Alien::Alien(float positionX, float positionY, int alienPoints, int row)
 {

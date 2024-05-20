@@ -3,8 +3,6 @@
 #include "alien.h"
 #include "structure.h"
 #include <vector>
-#include <stdio.h>
-#include <stdio.h>
 
 std::vector<Alien> createAliens() {
 

@@ -1,5 +1,4 @@
 #include "player.h"
-#include <raylib.h>
 
 Player::Player(float positionX, float positionY)
 {

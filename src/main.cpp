@@ -37,14 +37,14 @@ int main()
     InitWindow(screenWidth, screenHeight, "Breakout!");
     SetTargetFPS(144);
 
+    std::vector<Alien> aliens = createAliens();
+
     Structure structure = Structure(screenWidth / 2 -300, 550);
     Structure structure2 = Structure(screenWidth / 2 -125, 550);
     Structure structure3 = Structure(screenWidth / 2 +50, 550);
     Structure structure4 = Structure(screenWidth / 2 +250, 550);
 
     Player player = Player(screenWidth / 2, screenHeight - 44);
-
-    std::vector<Alien> aliens = createAliens();
 
     InitAudioDevice();
 

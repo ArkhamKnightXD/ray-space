@@ -9,8 +9,10 @@ public:
     ~Alien();
     void Draw();
 
-public:
+private:
     Texture2D sprite;
+
+public:
     Rectangle bounds;
     int points;
     bool isDestroyed;

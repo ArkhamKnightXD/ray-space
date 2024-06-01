@@ -1,6 +1,8 @@
 #include <raylib.h>
 #include "player.h"
 #include "alien.h"
+#include "MysteryShip.h"
+#include "Laser.h"
 #include "structure.h"
 #include <vector>
 
@@ -42,6 +44,10 @@ int main()
     Structure structure3 = Structure(screenWidth / 2 +50, 550);
     Structure structure4 = Structure(screenWidth / 2 +250, 550);
 
+    MysteryShip mysteryShip = MysteryShip(screenWidth / 2, screenHeight - 200, 4);
+
+    Laser laser = Laser(screenWidth / 2, screenHeight - 200);
+
     Player player = Player(screenWidth / 2, screenHeight - 44);
 
     std::vector<Alien> aliens = createAliens();
@@ -71,7 +77,7 @@ int main()
 
         BeginDrawing();
 
-            ClearBackground(Color{0,0,0,0});
+            ClearBackground(Color{29, 29, 27 , 255});
 
             DrawText(TextFormat("Score: %i", player.score), 150, 10, 20, WHITE);
             DrawText(TextFormat("Lives %i", player.lives), screenWidth - 250, 10, 20, WHITE);
@@ -85,6 +91,9 @@ int main()
             structure2.Draw();
             structure3.Draw();
             structure4.Draw();
+
+            // mysteryShip.Draw();
+            // laser.Draw();
 
             player.Draw();
 

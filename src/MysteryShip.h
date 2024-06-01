@@ -2,11 +2,11 @@
 
 #include <raylib.h>
 
-class Structure
+class MysteryShip
 {
 public:
-    Structure(float positionX, float positionY);
-    ~Structure();
+    MysteryShip(float positionX, float positionY, int points);
+    ~MysteryShip();
     void Draw();
 
 private:
@@ -14,6 +14,6 @@ private:
 
 public:
     Rectangle bounds;
-    int lives;
+    int points;
     bool isDestroyed;
 };

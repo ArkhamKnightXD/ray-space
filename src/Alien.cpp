@@ -28,6 +28,10 @@ Alien::~Alien()
     // UnloadTexture(sprite);
 }
 
+void Alien::Update()
+{
+}
+
 void Alien::Draw()
 {
     if (!isDestroyed)

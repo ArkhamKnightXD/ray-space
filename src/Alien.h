@@ -7,6 +7,7 @@ class Alien
 public:
     Alien(float positionX, float positionY, int points, int row);
     ~Alien();
+    void Update();
     void Draw();
 
 private:

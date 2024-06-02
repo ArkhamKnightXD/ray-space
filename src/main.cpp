@@ -39,10 +39,12 @@ int main()
     InitWindow(screenWidth, screenHeight, "Breakout!");
     SetTargetFPS(144);
 
-    Structure structure = Structure(screenWidth / 2 -300, 550);
-    Structure structure2 = Structure(screenWidth / 2 -125, 550);
-    Structure structure3 = Structure(screenWidth / 2 +50, 550);
-    Structure structure4 = Structure(screenWidth / 2 +250, 550);
+    std::vector<Structure> structures;
+
+    structures.push_back(Structure(screenWidth / 2 -300, 550));
+    structures.push_back(Structure(screenWidth / 2 -125, 550));
+    structures.push_back(Structure(screenWidth / 2 +50, 550));
+    structures.push_back(Structure(screenWidth / 2 +250, 550));
 
     MysteryShip mysteryShip = MysteryShip(screenWidth / 2, screenHeight - 200, 4);
 
@@ -62,15 +64,30 @@ int main()
 
         player.Update(deltaTime);
 
-        // for (unsigned int i = 0; i < bricks.size(); i++)
+        laser.Update(deltaTime);
+
+//checking collisions
+        // for (unsigned int i = 0; i < structures.size(); i++)
         // {
-        //     if (!bricks[i].isDestroyed)
+        //     if (!structures[i].isDestroyed && CheckCollisionRecs(structures[i].bounds, bulletBounds))
         //     {
-        //         bricks[i].isDestroyed = true;
+        //         structures[i].isDestroyed = true;
 
-        //         player.score += bricks[i].brickPoints; 
+        //         structures[i].lives --; 
 
-        //         PlaySound(brickHitSound);
+        //         PlaySound(bulletHitSound);
+        //     }
+        // }
+
+        // for (unsigned int i = 0; i < aliens.size(); i++)
+        // {
+        //     if (!aliens[i].isDestroyed && CheckCollisionRecs(aliens[i].bounds, bulletBounds))
+        //     {
+        //         aliens[i].isDestroyed = true;
+
+        //         player.score += aliens[i].points; 
+
+        //         PlaySound(bulletHitSound);
         //     }
         // }
 
@@ -87,13 +104,13 @@ int main()
                 alien.Draw();
             }
 
-            structure.Draw();
-            structure2.Draw();
-            structure3.Draw();
-            structure4.Draw();
+            for (Structure structure : structures)
+            {
+                structure.Draw();
+            }
 
             // mysteryShip.Draw();
-            // laser.Draw();
+            laser.Draw();
 
             player.Draw();
 

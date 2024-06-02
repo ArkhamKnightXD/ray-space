@@ -50,6 +50,8 @@ int main()
 
     Laser laser = Laser(screenWidth / 2, screenHeight - 200);
 
+    std::vector<Laser> lasers;
+
     Player player = Player(screenWidth / 2, screenHeight - 44);
 
     std::vector<Alien> aliens = createAliens();
@@ -64,7 +66,18 @@ int main()
 
         player.Update(deltaTime);
 
+        // if (IsKeyDown(KEY_SPACE)) 
+        // {
+        //     lasers.push_back(Laser(screenWidth / 2, screenHeight - 200));
+        // }
+
         laser.Update(deltaTime);
+
+        // try updating with for loops. 
+        // for (Laser laser : lasers)
+        // {
+        //     laser.Update(deltaTime);
+        // }
 
 //checking collisions
         // for (unsigned int i = 0; i < structures.size(); i++)
@@ -110,7 +123,10 @@ int main()
             }
 
             // mysteryShip.Draw();
-            laser.Draw();
+            for (Laser laser : lasers)
+            {
+                laser.Draw();
+            }
 
             player.Draw();
 

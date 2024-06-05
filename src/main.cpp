@@ -48,13 +48,11 @@ int main()
 
     MysteryShip mysteryShip = MysteryShip(screenWidth / 2, screenHeight - 200, 4);
 
-    Laser laser = Laser(screenWidth / 2, screenHeight - 200);
+    std::vector<Alien> aliens = createAliens();
 
     std::vector<Laser> lasers;
 
     Player player = Player(screenWidth / 2, screenHeight - 44);
-
-    std::vector<Alien> aliens = createAliens();
 
     InitAudioDevice();
 
@@ -66,20 +64,18 @@ int main()
 
         player.Update(deltaTime);
 
-        // if (IsKeyDown(KEY_SPACE)) 
-        // {
-        //     lasers.push_back(Laser(screenWidth / 2, screenHeight - 200));
-        // }
+        if (IsKeyDown(KEY_SPACE)) 
+        {
+            lasers.push_back(Laser(player.bounds.x, player.bounds.y - player.bounds.height));
+            PlaySound(bulletHitSound);
+        }
 
-        laser.Update(deltaTime);
+        for (unsigned int i = 0; i < lasers.size(); i++)
+        {
+            lasers[i].Update(deltaTime);
+        }
 
-        // try updating with for loops. 
-        // for (Laser laser : lasers)
-        // {
-        //     laser.Update(deltaTime);
-        // }
-
-//checking collisions
+        //checking collisions
         // for (unsigned int i = 0; i < structures.size(); i++)
         // {
         //     if (!structures[i].isDestroyed && CheckCollisionRecs(structures[i].bounds, bulletBounds))

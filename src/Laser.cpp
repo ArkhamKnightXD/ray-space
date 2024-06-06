@@ -13,7 +13,7 @@ Laser::~Laser()
 
 void Laser::Update(float deltaTime)
 {
-    bounds.y -= 200 * deltaTime;
+    bounds.y -= 400 * deltaTime;
 
     if (bounds.y < 0 || bounds.y > GetScreenHeight())
         isActive = false;    

@@ -1,9 +1,9 @@
 #include <raylib.h>
-#include "player.h"
-#include "alien.h"
+#include "Player.h"
+#include "Alien.h"
 #include "MysteryShip.h"
 #include "Laser.h"
-#include "structure.h"
+#include "Structure.h"
 #include <vector>
 #include <stdio.h>
 
@@ -126,17 +126,6 @@ int main()
             laser.Update(deltaTime);
         }
 
-        // Alien movement its failling
-        // for (Alien &alien : aliens)
-        // {
-        //     float alienPosition = alien.bounds.x + alien.bounds.width;
-
-        //     if (alienPosition > screenWidth || alienPosition < 0)
-        //     {
-        //         alien.velocity *= -1;
-        //     }
-        // }
-
         for (Structure &structure : structures)
         {
             for (Laser &laser : lasers)
@@ -157,6 +146,7 @@ int main()
             }
         }
 
+        // Alien movement its failling
         // for (Alien &alien : aliens)
         // {
         //     float alienPosition = alien.bounds.x + alien.bounds.width;
@@ -165,6 +155,8 @@ int main()
         //     {
         //         alien.velocity *= -1;
         //     }
+
+        //     alien.Update(deltaTime);
         // }
 
         for (Laser &laser : lasers)
@@ -185,28 +177,28 @@ int main()
 
         BeginDrawing();
 
-        ClearBackground(Color{29, 29, 27, 255});
+            ClearBackground(Color{29, 29, 27, 255});
 
-        DrawText(TextFormat("Score: %i", player.score), 150, 10, 20, WHITE);
-        DrawText(TextFormat("Lives %i", player.lives), screenWidth - 250, 10, 20, WHITE);
+            DrawText(TextFormat("Score: %i", player.score), 150, 10, 20, WHITE);
+            DrawText(TextFormat("Lives %i", player.lives), screenWidth - 250, 10, 20, WHITE);
 
-        for (Alien alien : aliens)
-        {
-            alien.Draw();
-        }
+            for (Alien alien : aliens)
+            {
+                alien.Draw();
+            }
 
-        for (Structure structure : structures)
-        {
-            structure.Draw();
-        }
+            for (Structure structure : structures)
+            {
+                structure.Draw();
+            }
 
-        // mysteryShip.Draw();
-        for (Laser laser : lasers)
-        {
-            laser.Draw();
-        }
+            // mysteryShip.Draw();
+            for (Laser laser : lasers)
+            {
+                laser.Draw();
+            }
 
-        player.Draw();
+            player.Draw();
 
         EndDrawing();
     }

@@ -1,4 +1,4 @@
-#include "alien.h"
+#include "Alien.h"
 
 //There is a method to load all 
 Alien::Alien(float positionX, float positionY, int alienPoints, Texture2D sprite)

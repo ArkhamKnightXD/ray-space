@@ -1,21 +1,9 @@
 #include "alien.h"
 
-Alien::Alien(float positionX, float positionY, int alienPoints, int row)
+//There is a method to load all 
+Alien::Alien(float positionX, float positionY, int alienPoints, Texture2D sprite)
 {
-    switch (row)  {
-
-        case 0:
-            sprite = LoadTexture("assets/sprites/alien_3.png");
-            break;
-
-        case 1:
-        case 2:
-            sprite = LoadTexture("assets/sprites/alien_2.png");
-            break;
-
-        default:
-            sprite = LoadTexture("assets/sprites/alien_1.png");
-    }
+    this->sprite = sprite;
         
     bounds = Rectangle{positionX, positionY, (float)sprite.width, (float)sprite.height};
 
@@ -28,8 +16,9 @@ Alien::~Alien()
     // UnloadTexture(sprite);
 }
 
-void Alien::Update()
+void Alien::Update(float deltaTime)
 {
+
 }
 
 void Alien::Draw()

@@ -7,8 +7,14 @@
 #include <vector>
 #include <stdio.h>
 
-std::vector<Alien> createAliens()
+std::vector<Alien> CreateAliens()
 {
+    //Since in my old method I was loading almost 50 texture, with this method I'm only loading 3 textures
+    std::vector<Texture2D> alienSprites;
+
+    alienSprites.push_back(LoadTexture("assets/sprites/alien_3.png"));
+    alienSprites.push_back(LoadTexture("assets/sprites/alien_2.png"));
+    alienSprites.push_back(LoadTexture("assets/sprites/alien_1.png"));
 
     std::vector<Alien> aliens;
 
@@ -16,13 +22,31 @@ std::vector<Alien> createAliens()
     int positionY = 100;
     int alienPoints = 8;
 
+    Texture2D actualSprite;
+
     for (int row = 0; row < 5; row++)
     {
         positionX = 54;
 
+        switch (row)
+        {
+
+        case 0:
+            actualSprite = alienSprites[0];
+            break;
+
+        case 1:
+        case 2:
+            actualSprite = alienSprites[1];
+            break;
+
+        default:
+            actualSprite = alienSprites[2];
+        }
+
         for (int columns = 0; columns < 11; columns++)
         {
-            aliens.push_back(Alien(positionX, positionY, alienPoints, row));
+            aliens.push_back(Alien(positionX, positionY, alienPoints, actualSprite));
             positionX += 60;
         }
 
@@ -41,8 +65,6 @@ int main()
     InitWindow(screenWidth, screenHeight, "Breakout!");
     SetTargetFPS(144);
 
-    float timer;
-
     std::vector<Structure> structures;
 
     structures.push_back(Structure(screenWidth / 2 - 300, 550));
@@ -52,15 +74,17 @@ int main()
 
     MysteryShip mysteryShip = MysteryShip(screenWidth / 2, screenHeight - 200, 4);
 
-    std::vector<Alien> aliens = createAliens();
+    std::vector<Alien> aliens = CreateAliens();
 
     std::vector<Laser> lasers;
+
+    float lastShootLaserTime;
 
     Player player = Player(screenWidth / 2, screenHeight - 44);
 
     InitAudioDevice();
 
-    Sound bulletHitSound = LoadSound("assets/sounds/laser.ogg");
+    Sound shootSound = LoadSound("assets/sounds/laser.ogg");
     Sound explosionSound = LoadSound("assets/sounds/explosion.ogg");
 
     while (!WindowShouldClose())
@@ -71,42 +95,59 @@ int main()
 
         if (IsKeyDown(KEY_SPACE))
         {
-            timer += deltaTime;
-
-            if (timer > 0.8f)
+            // shoot one laser every 350 ms
+            if (GetTime() - lastShootLaserTime >= 0.35)
             {
-                lasers.push_back(Laser(player.bounds.x +20, player.bounds.y - player.bounds.height));
-                PlaySound(bulletHitSound);
+                lasers.push_back(Laser(player.bounds.x + 20, player.bounds.y - player.bounds.height));
+                lastShootLaserTime = GetTime();
 
-                timer = 0;
+                PlaySound(shootSound);
             }
         }
 
-        // eliminate lasers that are outside of the screen
-        for (unsigned int i = 0; i < lasers.size(); i++)
+        // Accessing the laseres elements using iterators like in java
+        for (auto iterator = lasers.begin(); iterator != lasers.end();)
         {
-            lasers[i].Update(deltaTime);
+            // If the element is not active I remove this element
+            if (!iterator->isActive)
+            {
+                lasers.erase(iterator);
+            }
+            // If the element is not active I need to increase the iterator to check the next element.
+            else
+            {
+                iterator++;
+            }
         }
 
-        // collision structure - laser its failling. 
-        for (unsigned int i = 0; i < structures.size(); i++)
+        // When I have to change state of the object with a ranged based loop I need to use & if not the state of the object won't change
+        for (Laser &laser : lasers)
         {
-            for (unsigned int i = 0; i < lasers.size(); i++)
+            laser.Update(deltaTime);
+        }
+
+        for (Alien &alien : aliens)
+        {
+            alien.Update(deltaTime);
+        }
+
+        // collision structure - laser its failling.
+        for (Structure &structure : structures)
+        {
+            for (Laser &laser : lasers)
             {
-                if (!structures[i].isDestroyed && CheckCollisionRecs(structures[i].bounds, lasers[i].bounds))
+                if (!structure.isDestroyed && CheckCollisionRecs(structure.bounds, laser.bounds))
                 {
-                    structures[i].lives--;
+                    laser.isActive = false;
 
-                    printf("enter here \n");
+                    structure.lives--;
 
-                    if (structures[i].lives == 0)
+                    if (structure.lives == 0)
                     {
-                        structures[i].isDestroyed = true;
+                        structure.isDestroyed = true;
                     }
 
                     PlaySound(explosionSound);
-
-                    lasers.pop_back();
                 }
             }
         }
@@ -119,7 +160,7 @@ int main()
 
         //         player.score += aliens[i].points;
 
-        //         PlaySound(bulletHitSound);
+        //         PlaySound(shootSound);
         //     }
         // }
 
@@ -151,7 +192,7 @@ int main()
         EndDrawing();
     }
 
-    UnloadSound(bulletHitSound);
+    UnloadSound(shootSound);
     CloseAudioDevice();
 
     CloseWindow();

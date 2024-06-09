@@ -16,5 +16,6 @@ private:
 public:
     Rectangle bounds;
     int points;
+    int velocity;
     bool isDestroyed;
 };

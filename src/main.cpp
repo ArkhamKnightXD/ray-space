@@ -9,7 +9,7 @@
 
 std::vector<Alien> CreateAliens()
 {
-    //Since in my old method I was loading almost 50 texture, with this method I'm only loading 3 textures
+    // Since in my old method I was loading almost 50 texture, with this method I'm only loading 3 textures
     std::vector<Texture2D> alienSprites;
 
     alienSprites.push_back(LoadTexture("assets/sprites/alien_3.png"));
@@ -109,7 +109,7 @@ int main()
         for (auto iterator = lasers.begin(); iterator != lasers.end();)
         {
             // If the element is not active I remove this element
-            if (!iterator->isActive)
+            if (iterator->isDestroyed)
             {
                 lasers.erase(iterator);
             }
@@ -126,19 +126,24 @@ int main()
             laser.Update(deltaTime);
         }
 
-        for (Alien &alien : aliens)
-        {
-            alien.Update(deltaTime);
-        }
+        // Alien movement its failling
+        // for (Alien &alien : aliens)
+        // {
+        //     float alienPosition = alien.bounds.x + alien.bounds.width;
 
-        // collision structure - laser its failling.
+        //     if (alienPosition > screenWidth || alienPosition < 0)
+        //     {
+        //         alien.velocity *= -1;
+        //     }
+        // }
+
         for (Structure &structure : structures)
         {
             for (Laser &laser : lasers)
             {
                 if (!structure.isDestroyed && CheckCollisionRecs(structure.bounds, laser.bounds))
                 {
-                    laser.isActive = false;
+                    laser.isDestroyed = true;
 
                     structure.lives--;
 
@@ -152,17 +157,31 @@ int main()
             }
         }
 
-        // for (unsigned int i = 0; i < aliens.size(); i++)
+        // for (Alien &alien : aliens)
         // {
-        //     if (!aliens[i].isDestroyed && CheckCollisionRecs(aliens[i].bounds, bulletBounds))
+        //     float alienPosition = alien.bounds.x + alien.bounds.width;
+
+        //     if (alienPosition > screenWidth || alienPosition < 0)
         //     {
-        //         aliens[i].isDestroyed = true;
-
-        //         player.score += aliens[i].points;
-
-        //         PlaySound(shootSound);
+        //         alien.velocity *= -1;
         //     }
         // }
+
+        for (Laser &laser : lasers)
+        {
+            for (Alien &alien : aliens)
+            {
+                if (!alien.isDestroyed && CheckCollisionRecs(alien.bounds, laser.bounds))
+                {
+                    alien.isDestroyed = true;
+                    laser.isDestroyed = true;
+
+                    player.score += alien.points;
+
+                    PlaySound(explosionSound);
+                }
+            }
+        }
 
         BeginDrawing();
 

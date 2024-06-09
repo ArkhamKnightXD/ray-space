@@ -4,7 +4,6 @@
 Laser::Laser(float positionX, float positionY)
 {
     bounds = Rectangle{positionX, positionY, 4, 16};
-    isActive = true;
 }
 
 Laser::~Laser()
@@ -16,13 +15,13 @@ void Laser::Update(float deltaTime)
     bounds.y -= 400 * deltaTime;
 
     if (bounds.y < 0 || bounds.y > GetScreenHeight())
-        isActive = false;    
+        isDestroyed = true;    
     else
-        isActive = true;
+        isDestroyed = false;
 }
 
 void Laser::Draw()
 {
-    if (isActive)
+    if (!isDestroyed)
         DrawRectangleRec(bounds, {243, 216, 63, 255});
 }

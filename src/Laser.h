@@ -12,5 +12,5 @@ public:
 
 public:
     Rectangle bounds;
-    bool isActive;
+    bool isDestroyed;
 };

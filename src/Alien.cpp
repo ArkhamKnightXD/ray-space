@@ -9,6 +9,7 @@ Alien::Alien(float positionX, float positionY, int alienPoints, Texture2D sprite
 
     points = alienPoints;
     isDestroyed = false;
+    velocity = 50;
 }
 
 Alien::~Alien()
@@ -18,7 +19,7 @@ Alien::~Alien()
 
 void Alien::Update(float deltaTime)
 {
-
+    bounds.x += velocity * deltaTime;
 }
 
 void Alien::Draw()

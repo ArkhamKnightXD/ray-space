@@ -60,6 +60,10 @@ int main()
     const int screenWidth = 750;
     const int screenHeight = 700;
 
+    bool shouldGoLeft;
+    bool shouldGoRight = true;
+    bool shouldGoDown = false;
+
     InitWindow(screenWidth, screenHeight, "Breakout!");
     SetTargetFPS(144);
 
@@ -145,17 +149,57 @@ int main()
         }
 
         // Alien movement its failling
-        // for (Alien &alien : aliens)
-        // {
-        //     float alienPosition = alien.bounds.x + alien.bounds.width;
+        for (Alien &alien : aliens)
+        {
+            float alienPosition = alien.bounds.x + alien.bounds.width;
 
-        //     if (alienPosition > screenWidth || alienPosition < alien.bounds.width)
-        //     {
-        //         alien.velocity *= -1;
-        //     }
+            if (!shouldGoLeft && alienPosition > screenWidth)
+            {
+                shouldGoLeft = true;
+                shouldGoRight = false;
+                shouldGoDown = true;
+                break;
+            }
 
-        //     alien.Update(deltaTime);
-        // }
+            if (!shouldGoRight && alienPosition < alien.bounds.width)
+            {
+                shouldGoRight = true;
+                shouldGoLeft = false;
+                shouldGoDown = true;
+                break;
+            }
+        }
+
+        if (shouldGoLeft)
+        {
+            for (Alien &alien : aliens)
+            {
+                alien.velocity = -50;
+            }
+        }
+
+        if (shouldGoRight)
+        {
+            for (Alien &alien : aliens)
+            {
+                alien.velocity = 50;
+            }
+        }
+
+        if (shouldGoDown)
+        {
+            for (Alien &alien : aliens)
+            {
+                alien.bounds.y += 20;
+            }
+
+            shouldGoDown = false;
+        }
+
+        for (Alien &alien : aliens)
+        {
+            alien.Update(deltaTime);
+        }
 
         for (Laser &laser : lasers)
         {
@@ -175,28 +219,28 @@ int main()
 
         BeginDrawing();
 
-            ClearBackground(Color{29, 29, 27, 255});
+        ClearBackground(Color{29, 29, 27, 255});
 
-            DrawText(TextFormat("Score: %i", player.score), 150, 10, 20, WHITE);
-            DrawText(TextFormat("Lives %i", player.lives), screenWidth - 250, 10, 20, WHITE);
+        DrawText(TextFormat("Score: %i", player.score), 150, 10, 20, WHITE);
+        DrawText(TextFormat("Lives %i", player.lives), screenWidth - 250, 10, 20, WHITE);
 
-            for (Alien alien : aliens)
-            {
-                alien.Draw();
-            }
+        for (Alien alien : aliens)
+        {
+            alien.Draw();
+        }
 
-            for (Structure structure : structures)
-            {
-                structure.Draw();
-            }
+        for (Structure structure : structures)
+        {
+            structure.Draw();
+        }
 
-            // mysteryShip.Draw();
-            for (Laser laser : lasers)
-            {
-                laser.Draw();
-            }
+        // mysteryShip.Draw();
+        for (Laser laser : lasers)
+        {
+            laser.Draw();
+        }
 
-            player.Draw();
+        player.Draw();
 
         EndDrawing();
     }

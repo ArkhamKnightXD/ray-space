@@ -6,7 +6,6 @@ Structure::Structure(float positionX, float positionY)
     bounds = Rectangle{positionX, positionY, (float)sprite.width, (float)sprite.height};
 
     lives = 5;
-    isDestroyed = false;
 }
 
 Structure::~Structure()

@@ -10,11 +10,9 @@
 std::vector<Alien> CreateAliens()
 {
     // Since in my old method I was loading almost 50 texture, with this method I'm only loading 3 textures
-    std::vector<Texture2D> alienSprites;
-
-    alienSprites.push_back(LoadTexture("assets/sprites/alien_3.png"));
-    alienSprites.push_back(LoadTexture("assets/sprites/alien_2.png"));
-    alienSprites.push_back(LoadTexture("assets/sprites/alien_1.png"));
+    Texture2D alienSprite1 = LoadTexture("assets/sprites/alien_1.png");
+    Texture2D alienSprite2 = LoadTexture("assets/sprites/alien_2.png");
+    Texture2D alienSprite3 = LoadTexture("assets/sprites/alien_3.png");
 
     std::vector<Alien> aliens;
 
@@ -32,16 +30,16 @@ std::vector<Alien> CreateAliens()
         {
 
         case 0:
-            actualSprite = alienSprites[0];
+            actualSprite = alienSprite3;
             break;
 
         case 1:
         case 2:
-            actualSprite = alienSprites[1];
+            actualSprite = alienSprite2;
             break;
 
         default:
-            actualSprite = alienSprites[2];
+            actualSprite = alienSprite1;
         }
 
         for (int columns = 0; columns < 11; columns++)
@@ -72,7 +70,7 @@ int main()
     structures.push_back(Structure(screenWidth / 2 + 50, 550));
     structures.push_back(Structure(screenWidth / 2 + 250, 550));
 
-    MysteryShip mysteryShip = MysteryShip(screenWidth / 2, screenHeight - 200, 4);
+    MysteryShip mysteryShip = MysteryShip(screenWidth / 2, screenHeight - 200);
 
     std::vector<Alien> aliens = CreateAliens();
 
@@ -151,7 +149,7 @@ int main()
         // {
         //     float alienPosition = alien.bounds.x + alien.bounds.width;
 
-        //     if (alienPosition > screenWidth || alienPosition < 0)
+        //     if (alienPosition > screenWidth || alienPosition < alien.bounds.width)
         //     {
         //         alien.velocity *= -1;
         //     }
@@ -204,8 +202,8 @@ int main()
     }
 
     UnloadSound(shootSound);
+    UnloadSound(explosionSound);
     CloseAudioDevice();
 
     CloseWindow();
-    return 0;
 }

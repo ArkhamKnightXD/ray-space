@@ -5,7 +5,7 @@
 class MysteryShip
 {
 public:
-    MysteryShip(float positionX, float positionY, int points);
+    MysteryShip(float positionX, float positionY);
     ~MysteryShip();
     void Draw();
 

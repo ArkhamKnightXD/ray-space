@@ -12,7 +12,6 @@ public:
 private:
     Texture2D sprite;
     
-
 public:
     Rectangle bounds;
     int lives;

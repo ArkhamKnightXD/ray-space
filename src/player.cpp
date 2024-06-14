@@ -28,7 +28,3 @@ void Player::Draw()
 {
     DrawTexture(sprite, bounds.x, bounds.y, WHITE);
 }
-
-void Player::ShootLaser()
-{
-}

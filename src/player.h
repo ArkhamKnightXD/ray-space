@@ -9,14 +9,13 @@ public:
     ~Player();
     void Update(float deltaTime);
     void Draw();
-    void ShootLaser();
 
 private:
     Texture2D sprite;
+    int speed;
 
 public:
     Rectangle bounds;
-    int speed;
     int score;
     int lives;
 };

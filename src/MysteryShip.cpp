@@ -1,18 +1,18 @@
 #include "MysteryShip.h"
 
-MysteryShip::MysteryShip(float positionX, float positionY, int alienPoints)
+MysteryShip::MysteryShip(float positionX, float positionY)
 {
     sprite = LoadTexture("assets/sprites/mystery.png");
         
     bounds = Rectangle{positionX, positionY, (float)sprite.width, (float)sprite.height};
 
-    points = alienPoints;
+    points = 50;
     isDestroyed = false;
 }
 
 MysteryShip::~MysteryShip()
 {
-    // UnloadTexture(sprite);
+    UnloadTexture(sprite);
 }
 
 void MysteryShip::Draw()

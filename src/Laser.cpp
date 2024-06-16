@@ -1,9 +1,10 @@
 #include "Laser.h"
 
 //Going to use my own code for the lasers.
-Laser::Laser(float positionX, float positionY)
+Laser::Laser(float positionX, float positionY, bool isAlienLaser)
 {
     bounds = Rectangle{positionX, positionY, 4, 16};
+    this->isAlienLaser = isAlienLaser;
 }
 
 Laser::~Laser()
@@ -12,8 +13,11 @@ Laser::~Laser()
 
 void Laser::Update(float deltaTime)
 {
-    bounds.y -= 400 * deltaTime;
-
+    if (isAlienLaser)
+        bounds.y += 400 * deltaTime;
+    else
+        bounds.y -= 400 * deltaTime;
+    
     if (bounds.y < 0 || bounds.y > GetScreenHeight())
         isDestroyed = true;    
     else

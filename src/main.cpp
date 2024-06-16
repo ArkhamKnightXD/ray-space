@@ -78,9 +78,11 @@ int main()
 
     std::vector<Alien> aliens = CreateAliens();
 
-    std::vector<Laser> lasers;
+    std::vector<Laser> playerLasers;
+    std::vector<Laser> alienLasers;
 
-    float lastShootLaserTime;
+    float lastShootLaserTimePlayer;
+    float lastShootLaserTimeAliens;
 
     Player player = Player(screenWidth / 2, screenHeight - 44);
 
@@ -98,22 +100,34 @@ int main()
         if (IsKeyDown(KEY_SPACE))
         {
             // shoot one laser every 350 ms
-            if (GetTime() - lastShootLaserTime >= 0.35)
+            if (GetTime() - lastShootLaserTimePlayer >= 0.5)
             {
-                lasers.push_back(Laser(player.bounds.x + 20, player.bounds.y - player.bounds.height));
-                lastShootLaserTime = GetTime();
+                playerLasers.push_back(Laser(player.bounds.x + 20, player.bounds.y - player.bounds.height, false));
+                lastShootLaserTimePlayer = GetTime();
 
                 PlaySound(shootSound);
             }
         }
 
+        if (GetTime() - lastShootLaserTimeAliens >= 1)
+        {
+            int randomAlienIndex = GetRandomValue(0, aliens.size() - 1);
+
+            Alien alien = aliens[randomAlienIndex];
+
+            alienLasers.push_back(Laser(alien.bounds.x + 20, alien.bounds.y + alien.bounds.height, true));
+            lastShootLaserTimeAliens = GetTime();
+
+            PlaySound(shootSound);
+        }
+
         // Accessing the laseres elements using iterators like in java
-        for (auto iterator = lasers.begin(); iterator != lasers.end();)
+        for (auto iterator = playerLasers.begin(); iterator != playerLasers.end();)
         {
             // If the element is not active I remove this element
             if (iterator->isDestroyed)
             {
-                lasers.erase(iterator);
+                playerLasers.erase(iterator);
             }
             // If the element is not active I need to increase the iterator to check the next element.
             else
@@ -123,14 +137,32 @@ int main()
         }
 
         // When I have to change state of the object with a ranged based loop I need to use & if not the state of the object won't change
-        for (Laser &laser : lasers)
+        for (Laser &laser : playerLasers)
+        {
+            laser.Update(deltaTime);
+        }
+
+
+        for (auto iterator = alienLasers.begin(); iterator != alienLasers.end();)
+        {
+            if (iterator->isDestroyed)
+            {
+                alienLasers.erase(iterator);
+            }
+            else
+            {
+                iterator++;
+            }
+        }
+
+        for (Laser &laser : alienLasers)
         {
             laser.Update(deltaTime);
         }
 
         for (Structure &structure : structures)
         {
-            for (Laser &laser : lasers)
+            for (Laser &laser : playerLasers)
             {
                 if (!structure.isDestroyed && CheckCollisionRecs(structure.bounds, laser.bounds))
                 {
@@ -148,7 +180,6 @@ int main()
             }
         }
 
-        // Alien movement its failling
         for (Alien &alien : aliens)
         {
             float alienPosition = alien.bounds.x + alien.bounds.width;
@@ -190,7 +221,7 @@ int main()
         {
             for (Alien &alien : aliens)
             {
-                alien.bounds.y += 20;
+                alien.bounds.y += 10;
             }
 
             shouldGoDown = false;
@@ -201,7 +232,7 @@ int main()
             alien.Update(deltaTime);
         }
 
-        for (Laser &laser : lasers)
+        for (Laser &laser : playerLasers)
         {
             for (Alien &alien : aliens)
             {
@@ -235,7 +266,12 @@ int main()
         }
 
         // mysteryShip.Draw();
-        for (Laser laser : lasers)
+        for (Laser laser : playerLasers)
+        {
+            laser.Draw();
+        }
+
+        for (Laser laser : alienLasers)
         {
             laser.Draw();
         }

@@ -9,7 +9,7 @@ MysteryShip::MysteryShip(float positionX, float positionY)
     points = 50;
     velocityX = -100;
     isDestroyed = false;
-    shouldMove = true;
+    shouldMove = false;
 }
 
 MysteryShip::~MysteryShip()
@@ -19,13 +19,16 @@ MysteryShip::~MysteryShip()
 
 void MysteryShip::Update(float deltaTime)
 {
-    if (bounds.x > GetScreenWidth() || bounds.x < -80)
+    if (shouldMove)
     {
-        velocityX *= -1;
-        shouldMove = false;
-    }
+        if (bounds.x > GetScreenWidth() || bounds.x < -80)
+        {
+            velocityX *= -1;
+            shouldMove = false;
+        }
 
-    bounds.x += velocityX * deltaTime;
+        bounds.x += velocityX * deltaTime;
+    }
 }
 
 void MysteryShip::Draw()

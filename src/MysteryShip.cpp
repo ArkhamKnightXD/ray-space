@@ -21,7 +21,7 @@ void MysteryShip::Update(float deltaTime)
 {
     if (shouldMove)
     {
-        if (bounds.x > GetScreenWidth() || bounds.x < -80)
+        if (bounds.x > GetScreenWidth() + bounds.width || bounds.x < -80)
         {
             velocityX *= -1;
             shouldMove = false;

@@ -98,14 +98,16 @@ int main()
 
         player.Update(deltaTime);
 
-        lastTimeMysteryShipSpawn += deltaTime;
-
-        // Its failling.
-        if (lastTimeMysteryShipSpawn >= 10)
+        if (!mysteryShip.shouldMove)
         {
-            lastTimeMysteryShipSpawn = 0;
+            lastTimeMysteryShipSpawn += deltaTime;
 
-            mysteryShip.shouldMove = true;
+            if (lastTimeMysteryShipSpawn >= 10)
+            {
+                lastTimeMysteryShipSpawn = 0;
+
+                mysteryShip.shouldMove = true;
+            }
         }
 
         mysteryShip.Update(deltaTime);
@@ -129,7 +131,7 @@ int main()
         }
 
         // Alien lasers
-        if (GetTime() - lastTimeAlienShoot >= 0.6)
+        if (!aliens.empty() && GetTime() - lastTimeAlienShoot >= 0.6)
         {
             int randomAlienIndex = GetRandomValue(0, aliens.size() - 1);
 
@@ -225,6 +227,18 @@ int main()
                 player.lives--;
 
                 PlaySound(explosionSound);
+            }
+        }
+
+        for (auto iterator = aliens.begin(); iterator != aliens.end();)
+        {
+            if (iterator->isDestroyed)
+            {
+                aliens.erase(iterator);
+            }
+            else
+            {
+                iterator++;
             }
         }
 

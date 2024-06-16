@@ -7,7 +7,7 @@ Player::Player(float positionX, float positionY)
     
     speed = 600;
     score = 0;
-    lives = 2;    
+    lives = 3;    
 }
 
 Player::~Player()

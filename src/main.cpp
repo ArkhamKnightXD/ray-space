@@ -81,8 +81,8 @@ int main()
     std::vector<Laser> playerLasers;
     std::vector<Laser> alienLasers;
 
-    float lastShootLaserTimePlayer;
-    float lastShootLaserTimeAliens;
+    float lastTimePlayerShoot;
+    float lastTimeAlienShoot;
 
     Player player = Player(screenWidth / 2, screenHeight - 44);
 
@@ -100,23 +100,23 @@ int main()
         if (IsKeyDown(KEY_SPACE))
         {
             // shoot one laser every 350 ms
-            if (GetTime() - lastShootLaserTimePlayer >= 0.5)
+            if (GetTime() - lastTimePlayerShoot >= 0.5)
             {
                 playerLasers.push_back(Laser(player.bounds.x + 20, player.bounds.y - player.bounds.height, false));
-                lastShootLaserTimePlayer = GetTime();
+                lastTimePlayerShoot = GetTime();
 
                 PlaySound(shootSound);
             }
         }
 
-        if (GetTime() - lastShootLaserTimeAliens >= 1)
+        if (GetTime() - lastTimeAlienShoot >= 1)
         {
             int randomAlienIndex = GetRandomValue(0, aliens.size() - 1);
 
             Alien alien = aliens[randomAlienIndex];
 
             alienLasers.push_back(Laser(alien.bounds.x + 20, alien.bounds.y + alien.bounds.height, true));
-            lastShootLaserTimeAliens = GetTime();
+            lastTimeAlienShoot = GetTime();
 
             PlaySound(shootSound);
         }
@@ -142,7 +142,6 @@ int main()
             laser.Update(deltaTime);
         }
 
-
         for (auto iterator = alienLasers.begin(); iterator != alienLasers.end();)
         {
             if (iterator->isDestroyed)
@@ -157,6 +156,15 @@ int main()
 
         for (Laser &laser : alienLasers)
         {
+            // if (player.lives > 0 && CheckCollisionRecs(player.bounds, laser.bounds))
+            // {
+            //     laser.isDestroyed = true;
+
+            //     player.lives--;
+
+            //     PlaySound(explosionSound);
+            // }
+
             laser.Update(deltaTime);
         }
 
@@ -174,6 +182,42 @@ int main()
                     {
                         structure.isDestroyed = true;
                     }
+
+                    PlaySound(explosionSound);
+                }
+            }
+        }
+
+        for (Structure &structure : structures)
+        {
+            for (Laser &laser : alienLasers)
+            {
+                if (!structure.isDestroyed && CheckCollisionRecs(structure.bounds, laser.bounds))
+                {
+                    laser.isDestroyed = true;
+
+                    structure.lives--;
+
+                    if (structure.lives == 0)
+                    {
+                        structure.isDestroyed = true;
+                    }
+
+                    PlaySound(explosionSound);
+                }
+            }
+        }
+
+        for (Laser &laser : playerLasers)
+        {
+            for (Alien &alien : aliens)
+            {
+                if (!alien.isDestroyed && CheckCollisionRecs(alien.bounds, laser.bounds))
+                {
+                    alien.isDestroyed = true;
+                    laser.isDestroyed = true;
+
+                    player.score += alien.points;
 
                     PlaySound(explosionSound);
                 }
@@ -232,51 +276,36 @@ int main()
             alien.Update(deltaTime);
         }
 
-        for (Laser &laser : playerLasers)
-        {
-            for (Alien &alien : aliens)
-            {
-                if (!alien.isDestroyed && CheckCollisionRecs(alien.bounds, laser.bounds))
-                {
-                    alien.isDestroyed = true;
-                    laser.isDestroyed = true;
-
-                    player.score += alien.points;
-
-                    PlaySound(explosionSound);
-                }
-            }
-        }
-
         BeginDrawing();
 
-        ClearBackground(Color{29, 29, 27, 255});
+            ClearBackground(Color{29, 29, 27, 255});
 
-        DrawText(TextFormat("Score: %i", player.score), 150, 10, 20, WHITE);
-        DrawText(TextFormat("Lives %i", player.lives), screenWidth - 250, 10, 20, WHITE);
+            DrawText(TextFormat("Score: %i", player.score), 150, 10, 20, WHITE);
+            DrawText(TextFormat("Lives %i", player.lives), screenWidth - 250, 10, 20, WHITE);
 
-        for (Alien alien : aliens)
-        {
-            alien.Draw();
-        }
+            // mysteryShip.Draw();
 
-        for (Structure structure : structures)
-        {
-            structure.Draw();
-        }
+            for (Alien alien : aliens)
+            {
+                alien.Draw();
+            }
 
-        // mysteryShip.Draw();
-        for (Laser laser : playerLasers)
-        {
-            laser.Draw();
-        }
+            for (Laser laser : alienLasers)
+            {
+                laser.Draw();
+            }
 
-        for (Laser laser : alienLasers)
-        {
-            laser.Draw();
-        }
+            for (Structure structure : structures)
+            {
+                structure.Draw();
+            }
 
-        player.Draw();
+            for (Laser laser : playerLasers)
+            {
+                laser.Draw();
+            }
+
+            player.Draw();
 
         EndDrawing();
     }

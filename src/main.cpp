@@ -74,7 +74,7 @@ int main()
     structures.push_back(Structure(screenWidth / 2 + 50, 550));
     structures.push_back(Structure(screenWidth / 2 + 250, 550));
 
-    MysteryShip mysteryShip = MysteryShip(screenWidth / 2, screenHeight - 200);
+    MysteryShip mysteryShip = MysteryShip(screenWidth, 40);
 
     std::vector<Alien> aliens = CreateAliens();
 
@@ -83,6 +83,7 @@ int main()
 
     float lastTimePlayerShoot;
     float lastTimeAlienShoot;
+    float lastTimeMysteryShipSpawn;
 
     Player player = Player(screenWidth / 2, screenHeight - 44);
 
@@ -96,6 +97,16 @@ int main()
         float deltaTime = GetFrameTime();
 
         player.Update(deltaTime);
+
+// Its failling. 
+        // if (!mysteryShip.shouldMove && GetTime() - lastTimeMysteryShipSpawn >= 5)
+        // {
+        //     lastTimeMysteryShipSpawn = GetTime();
+
+        //     mysteryShip.shouldMove = true;
+        // }
+
+        mysteryShip.Update(deltaTime);
 
         if (IsKeyDown(KEY_SPACE))
         {
@@ -131,7 +142,7 @@ int main()
         }
 
         // Alien lasers
-        if (GetTime() - lastTimeAlienShoot >= 1)
+        if (GetTime() - lastTimeAlienShoot >= 0.6)
         {
             int randomAlienIndex = GetRandomValue(0, aliens.size() - 1);
 
@@ -287,7 +298,7 @@ int main()
         DrawText(TextFormat("Score: %i", player.score), 150, 10, 20, WHITE);
         DrawText(TextFormat("Lives %i", player.lives), screenWidth - 250, 10, 20, WHITE);
 
-        // mysteryShip.Draw();
+        mysteryShip.Draw();
 
         for (Alien alien : aliens)
         {

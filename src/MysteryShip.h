@@ -7,6 +7,7 @@ class MysteryShip
 public:
     MysteryShip(float positionX, float positionY);
     ~MysteryShip();
+    void Update(float deltaTime);
     void Draw();
 
 private:
@@ -16,4 +17,6 @@ public:
     Rectangle bounds;
     int points;
     bool isDestroyed;
+    bool shouldMove;
+    float velocityX;
 };

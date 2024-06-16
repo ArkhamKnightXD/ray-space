@@ -109,18 +109,6 @@ int main()
             }
         }
 
-        if (GetTime() - lastTimeAlienShoot >= 1)
-        {
-            int randomAlienIndex = GetRandomValue(0, aliens.size() - 1);
-
-            Alien alien = aliens[randomAlienIndex];
-
-            alienLasers.push_back(Laser(alien.bounds.x + 20, alien.bounds.y + alien.bounds.height, true));
-            lastTimeAlienShoot = GetTime();
-
-            PlaySound(shootSound);
-        }
-
         // Accessing the laseres elements using iterators like in java
         for (auto iterator = playerLasers.begin(); iterator != playerLasers.end();)
         {
@@ -142,6 +130,19 @@ int main()
             laser.Update(deltaTime);
         }
 
+        // Alien lasers
+        if (GetTime() - lastTimeAlienShoot >= 1)
+        {
+            int randomAlienIndex = GetRandomValue(0, aliens.size() - 1);
+
+            Alien alien = aliens[randomAlienIndex];
+
+            alienLasers.push_back(Laser(alien.bounds.x + 20, alien.bounds.y + alien.bounds.height, true));
+            lastTimeAlienShoot = GetTime();
+
+            PlaySound(shootSound);
+        }
+
         for (auto iterator = alienLasers.begin(); iterator != alienLasers.end();)
         {
             if (iterator->isDestroyed)
@@ -156,15 +157,6 @@ int main()
 
         for (Laser &laser : alienLasers)
         {
-            // if (player.lives > 0 && CheckCollisionRecs(player.bounds, laser.bounds))
-            // {
-            //     laser.isDestroyed = true;
-
-            //     player.lives--;
-
-            //     PlaySound(explosionSound);
-            // }
-
             laser.Update(deltaTime);
         }
 
@@ -224,6 +216,18 @@ int main()
             }
         }
 
+        for (Laser &laser : alienLasers)
+        {
+            if (player.lives > 0 && CheckCollisionRecs(player.bounds, laser.bounds))
+            {
+                laser.isDestroyed = true;
+
+                player.lives--;
+
+                PlaySound(explosionSound);
+            }
+        }
+
         for (Alien &alien : aliens)
         {
             float alienPosition = alien.bounds.x + alien.bounds.width;
@@ -278,34 +282,34 @@ int main()
 
         BeginDrawing();
 
-            ClearBackground(Color{29, 29, 27, 255});
+        ClearBackground(Color{29, 29, 27, 255});
 
-            DrawText(TextFormat("Score: %i", player.score), 150, 10, 20, WHITE);
-            DrawText(TextFormat("Lives %i", player.lives), screenWidth - 250, 10, 20, WHITE);
+        DrawText(TextFormat("Score: %i", player.score), 150, 10, 20, WHITE);
+        DrawText(TextFormat("Lives %i", player.lives), screenWidth - 250, 10, 20, WHITE);
 
-            // mysteryShip.Draw();
+        // mysteryShip.Draw();
 
-            for (Alien alien : aliens)
-            {
-                alien.Draw();
-            }
+        for (Alien alien : aliens)
+        {
+            alien.Draw();
+        }
 
-            for (Laser laser : alienLasers)
-            {
-                laser.Draw();
-            }
+        for (Laser laser : alienLasers)
+        {
+            laser.Draw();
+        }
 
-            for (Structure structure : structures)
-            {
-                structure.Draw();
-            }
+        for (Structure structure : structures)
+        {
+            structure.Draw();
+        }
 
-            for (Laser laser : playerLasers)
-            {
-                laser.Draw();
-            }
+        for (Laser laser : playerLasers)
+        {
+            laser.Draw();
+        }
 
-            player.Draw();
+        player.Draw();
 
         EndDrawing();
     }

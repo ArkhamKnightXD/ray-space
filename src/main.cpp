@@ -99,12 +99,12 @@ int main()
         player.Update(deltaTime);
 
 // Its failling. 
-        // if (!mysteryShip.shouldMove && GetTime() - lastTimeMysteryShipSpawn >= 5)
-        // {
-        //     lastTimeMysteryShipSpawn = GetTime();
+        if (!mysteryShip.shouldMove && GetTime() - lastTimeMysteryShipSpawn >= 5)
+        {
+            lastTimeMysteryShipSpawn = GetTime();
 
-        //     mysteryShip.shouldMove = true;
-        // }
+            mysteryShip.shouldMove = true;
+        }
 
         mysteryShip.Update(deltaTime);
 
@@ -117,21 +117,6 @@ int main()
                 lastTimePlayerShoot = GetTime();
 
                 PlaySound(shootSound);
-            }
-        }
-
-        // Accessing the laseres elements using iterators like in java
-        for (auto iterator = playerLasers.begin(); iterator != playerLasers.end();)
-        {
-            // If the element is not active I remove this element
-            if (iterator->isDestroyed)
-            {
-                playerLasers.erase(iterator);
-            }
-            // If the element is not active I need to increase the iterator to check the next element.
-            else
-            {
-                iterator++;
             }
         }
 
@@ -152,18 +137,6 @@ int main()
             lastTimeAlienShoot = GetTime();
 
             PlaySound(shootSound);
-        }
-
-        for (auto iterator = alienLasers.begin(); iterator != alienLasers.end();)
-        {
-            if (iterator->isDestroyed)
-            {
-                alienLasers.erase(iterator);
-            }
-            else
-            {
-                iterator++;
-            }
         }
 
         for (Laser &laser : alienLasers)
@@ -239,6 +212,34 @@ int main()
             }
         }
 
+        //method for removing lasers after all the collision checks removing 
+         // Accessing the laseres elements using iterators like in java
+        for (auto iterator = playerLasers.begin(); iterator != playerLasers.end();)
+        {
+            // If the element is not active I remove this element
+            if (iterator->isDestroyed)
+            {
+                playerLasers.erase(iterator);
+            }
+            // If the element is not active I need to increase the iterator to check the next element.
+            else
+            {
+                iterator++;
+            }
+        }
+
+        for (auto iterator = alienLasers.begin(); iterator != alienLasers.end();)
+        {
+            if (iterator->isDestroyed)
+            {
+                alienLasers.erase(iterator);
+            }
+            else
+            {
+                iterator++;
+            }
+        }
+
         for (Alien &alien : aliens)
         {
             float alienPosition = alien.bounds.x + alien.bounds.width;
@@ -293,34 +294,34 @@ int main()
 
         BeginDrawing();
 
-        ClearBackground(Color{29, 29, 27, 255});
+            ClearBackground(Color{29, 29, 27, 255});
 
-        DrawText(TextFormat("Score: %i", player.score), 150, 10, 20, WHITE);
-        DrawText(TextFormat("Lives %i", player.lives), screenWidth - 250, 10, 20, WHITE);
+            DrawText(TextFormat("Score: %i", player.score), 150, 10, 20, WHITE);
+            DrawText(TextFormat("Lives %i", player.lives), screenWidth - 250, 10, 20, WHITE);
 
-        mysteryShip.Draw();
+            mysteryShip.Draw();
 
-        for (Alien alien : aliens)
-        {
-            alien.Draw();
-        }
+            for (Alien alien : aliens)
+            {
+                alien.Draw();
+            }
 
-        for (Laser laser : alienLasers)
-        {
-            laser.Draw();
-        }
+            for (Laser laser : alienLasers)
+            {
+                laser.Draw();
+            }
 
-        for (Structure structure : structures)
-        {
-            structure.Draw();
-        }
+            for (Structure structure : structures)
+            {
+                structure.Draw();
+            }
 
-        for (Laser laser : playerLasers)
-        {
-            laser.Draw();
-        }
+            for (Laser laser : playerLasers)
+            {
+                laser.Draw();
+            }
 
-        player.Draw();
+            player.Draw();
 
         EndDrawing();
     }

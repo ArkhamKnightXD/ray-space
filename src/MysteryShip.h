@@ -12,11 +12,11 @@ public:
 
 private:
     Texture2D sprite;
+    float velocityX;
 
 public:
     Rectangle bounds;
     int points;
     bool isDestroyed;
     bool shouldMove;
-    float velocityX;
 };

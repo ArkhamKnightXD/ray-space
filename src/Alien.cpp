@@ -12,11 +12,6 @@ Alien::Alien(float positionX, float positionY, int alienPoints, Texture2D sprite
     velocity = 50;
 }
 
-Alien::~Alien()
-{
-    // UnloadTexture(sprite);
-}
-
 void Alien::Update(float deltaTime)
 {
     bounds.x += velocity * deltaTime;

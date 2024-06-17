@@ -5,7 +5,24 @@
 #include "Laser.h"
 #include "Structure.h"
 #include <vector>
-#include <stdio.h>
+
+const int screenWidth = 750;
+const int screenHeight = 700;
+
+bool shouldAliensGoLeft;
+bool shouldAliensGoRight = true;
+bool shouldAliensGoDown = false;
+
+Sound shootSound;
+Sound explosionSound;
+
+// MysteryShip *mysteryShip = NULL;
+// Player *player = NULL;
+
+std::vector<Alien> aliens;
+std::vector<Structure> structures;
+std::vector<Laser> playerLasers;
+std::vector<Laser> alienLasers;
 
 std::vector<Alien> CreateAliens()
 {
@@ -55,7 +72,63 @@ std::vector<Alien> CreateAliens()
     return aliens;
 }
 
-void CheckCollisionBetweenStructureAndLaser(std::vector<Structure> &structures, Laser &laser, Sound explosionSound)
+void AliensMovement(float deltaTime)
+{
+    for (Alien &alien : aliens)
+    {
+        float alienPosition = alien.bounds.x + alien.bounds.width;
+
+        if (!shouldAliensGoLeft && alienPosition > screenWidth)
+        {
+            shouldAliensGoLeft = true;
+            shouldAliensGoRight = false;
+            shouldAliensGoDown = true;
+            break;
+        }
+
+        if (!shouldAliensGoRight && alienPosition < alien.bounds.width)
+        {
+            shouldAliensGoRight = true;
+            shouldAliensGoLeft = false;
+            shouldAliensGoDown = true;
+            break;
+        }
+    }
+
+    if (shouldAliensGoLeft)
+    {
+        for (Alien &alien : aliens)
+        {
+            alien.velocity = -50;
+        }
+    }
+
+    if (shouldAliensGoRight)
+    {
+        for (Alien &alien : aliens)
+        {
+            alien.velocity = 50;
+        }
+    }
+
+    if (shouldAliensGoDown)
+    {
+        for (Alien &alien : aliens)
+        {
+            alien.bounds.y += 10;
+        }
+
+        shouldAliensGoDown = false;
+    }
+
+    for (Alien &alien : aliens)
+    {
+        alien.Update(deltaTime);
+    }
+}
+
+// The rule of the reference also applies to function parameters if I don't put the & I will be sending a copy of the object.
+void CheckCollisionBetweenStructureAndLaser(Laser &laser)
 {
     for (Structure &structure : structures)
     {
@@ -77,40 +150,28 @@ void CheckCollisionBetweenStructureAndLaser(std::vector<Structure> &structures, 
 
 int main()
 {
-    const int screenWidth = 750;
-    const int screenHeight = 700;
-
-    bool shouldGoLeft;
-    bool shouldGoRight = true;
-    bool shouldGoDown = false;
-
-    InitWindow(screenWidth, screenHeight, "Breakout!");
+    InitWindow(screenWidth, screenHeight, "Space!");
     SetTargetFPS(144);
 
-    std::vector<Structure> structures;
+    MysteryShip mysteryShip = MysteryShip(screenWidth, 40);
+
+    aliens = CreateAliens();
 
     structures.push_back(Structure(screenWidth / 2 - 300, 550));
     structures.push_back(Structure(screenWidth / 2 - 125, 550));
     structures.push_back(Structure(screenWidth / 2 + 50, 550));
     structures.push_back(Structure(screenWidth / 2 + 250, 550));
 
-    MysteryShip mysteryShip = MysteryShip(screenWidth, 40);
-
-    std::vector<Alien> aliens = CreateAliens();
-
-    std::vector<Laser> playerLasers;
-    std::vector<Laser> alienLasers;
+    Player player = Player(screenWidth / 2, screenHeight - 44);
 
     float lastTimePlayerShoot;
     float lastTimeAlienShoot;
     float lastTimeMysteryShipSpawn;
 
-    Player player = Player(screenWidth / 2, screenHeight - 44);
-
     InitAudioDevice();
 
-    Sound shootSound = LoadSound("assets/sounds/laser.ogg");
-    Sound explosionSound = LoadSound("assets/sounds/explosion.ogg");
+    shootSound = LoadSound("assets/sounds/laser.ogg");
+    explosionSound = LoadSound("assets/sounds/explosion.ogg");
 
     while (!WindowShouldClose())
     {
@@ -194,7 +255,7 @@ int main()
                 }
             }
 
-            CheckCollisionBetweenStructureAndLaser(structures, laser, explosionSound);
+            CheckCollisionBetweenStructureAndLaser(laser);
         }
 
         for (Laser &laser : alienLasers)
@@ -208,7 +269,7 @@ int main()
                 PlaySound(explosionSound);
             }
 
-            CheckCollisionBetweenStructureAndLaser(structures, laser, explosionSound);
+            CheckCollisionBetweenStructureAndLaser(laser);
         }
 
         for (auto iterator = aliens.begin(); iterator != aliens.end();)
@@ -251,57 +312,7 @@ int main()
             }
         }
 
-        for (Alien &alien : aliens)
-        {
-            float alienPosition = alien.bounds.x + alien.bounds.width;
-
-            if (!shouldGoLeft && alienPosition > screenWidth)
-            {
-                shouldGoLeft = true;
-                shouldGoRight = false;
-                shouldGoDown = true;
-                break;
-            }
-
-            if (!shouldGoRight && alienPosition < alien.bounds.width)
-            {
-                shouldGoRight = true;
-                shouldGoLeft = false;
-                shouldGoDown = true;
-                break;
-            }
-        }
-
-        if (shouldGoLeft)
-        {
-            for (Alien &alien : aliens)
-            {
-                alien.velocity = -50;
-            }
-        }
-
-        if (shouldGoRight)
-        {
-            for (Alien &alien : aliens)
-            {
-                alien.velocity = 50;
-            }
-        }
-
-        if (shouldGoDown)
-        {
-            for (Alien &alien : aliens)
-            {
-                alien.bounds.y += 10;
-            }
-
-            shouldGoDown = false;
-        }
-
-        for (Alien &alien : aliens)
-        {
-            alien.Update(deltaTime);
-        }
+        AliensMovement(deltaTime);
 
         BeginDrawing();
 
@@ -337,9 +348,9 @@ int main()
         EndDrawing();
     }
 
+//Unload all sprites.
     UnloadSound(shootSound);
     UnloadSound(explosionSound);
     CloseAudioDevice();
-
     CloseWindow();
 }

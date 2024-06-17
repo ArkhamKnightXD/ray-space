@@ -7,10 +7,6 @@ Laser::Laser(float positionX, float positionY, bool isAlienLaser)
     this->isAlienLaser = isAlienLaser;
 }
 
-Laser::~Laser()
-{
-}
-
 void Laser::Update(float deltaTime)
 {
     if (isAlienLaser)

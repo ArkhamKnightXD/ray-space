@@ -6,7 +6,6 @@ class Structure
 {
 public:
     Structure(float positionX, float positionY);
-    ~Structure();
     void Draw();
 
 private:

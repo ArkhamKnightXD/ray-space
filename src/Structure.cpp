@@ -8,10 +8,6 @@ Structure::Structure(float positionX, float positionY)
     lives = 5;
 }
 
-Structure::~Structure()
-{
-}
-
 void Structure::Draw()
 {
     if (!isDestroyed)

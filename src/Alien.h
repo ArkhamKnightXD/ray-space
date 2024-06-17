@@ -6,7 +6,6 @@ class Alien
 {
 public:
     Alien(float positionX, float positionY, int points, Texture2D sprite);
-    ~Alien();
     void Update(float deltaTime);
     void Draw();
 

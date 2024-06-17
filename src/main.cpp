@@ -55,6 +55,26 @@ std::vector<Alien> CreateAliens()
     return aliens;
 }
 
+void CheckCollisionBetweenStructureAndLaser(std::vector<Structure> &structures, Laser &laser, Sound explosionSound)
+{
+    for (Structure &structure : structures)
+    {
+        if (!structure.isDestroyed && CheckCollisionRecs(structure.bounds, laser.bounds))
+        {
+            laser.isDestroyed = true;
+
+            structure.lives--;
+
+            if (structure.lives == 0)
+            {
+                structure.isDestroyed = true;
+            }
+
+            PlaySound(explosionSound);
+        }
+    }
+}
+
 int main()
 {
     const int screenWidth = 750;
@@ -148,62 +168,6 @@ int main()
             laser.Update(deltaTime);
         }
 
-        for (Structure &structure : structures)
-        {
-            for (Laser &laser : playerLasers)
-            {
-                if (!structure.isDestroyed && CheckCollisionRecs(structure.bounds, laser.bounds))
-                {
-                    laser.isDestroyed = true;
-
-                    structure.lives--;
-
-                    if (structure.lives == 0)
-                    {
-                        structure.isDestroyed = true;
-                    }
-
-                    PlaySound(explosionSound);
-                }
-            }
-        }
-
-        for (Structure &structure : structures)
-        {
-            for (Laser &laser : alienLasers)
-            {
-                if (!structure.isDestroyed && CheckCollisionRecs(structure.bounds, laser.bounds))
-                {
-                    laser.isDestroyed = true;
-
-                    structure.lives--;
-
-                    if (structure.lives == 0)
-                    {
-                        structure.isDestroyed = true;
-                    }
-
-                    PlaySound(explosionSound);
-                }
-            }
-        }
-
-        for (Laser &laser : playerLasers)
-        {
-            for (Alien &alien : aliens)
-            {
-                if (!alien.isDestroyed && CheckCollisionRecs(alien.bounds, laser.bounds))
-                {
-                    alien.isDestroyed = true;
-                    laser.isDestroyed = true;
-
-                    player.score += alien.points;
-
-                    PlaySound(explosionSound);
-                }
-            }
-        }
-
         for (Laser &laser : playerLasers)
         {
             if (!mysteryShip.isDestroyed && CheckCollisionRecs(mysteryShip.bounds, laser.bounds))
@@ -216,6 +180,21 @@ int main()
 
                 PlaySound(explosionSound);
             }
+
+            for (Alien &alien : aliens)
+            {
+                if (!alien.isDestroyed && CheckCollisionRecs(alien.bounds, laser.bounds))
+                {
+                    alien.isDestroyed = true;
+                    laser.isDestroyed = true;
+
+                    player.score += alien.points;
+
+                    PlaySound(explosionSound);
+                }
+            }
+
+            CheckCollisionBetweenStructureAndLaser(structures, laser, explosionSound);
         }
 
         for (Laser &laser : alienLasers)
@@ -228,6 +207,8 @@ int main()
 
                 PlaySound(explosionSound);
             }
+
+            CheckCollisionBetweenStructureAndLaser(structures, laser, explosionSound);
         }
 
         for (auto iterator = aliens.begin(); iterator != aliens.end();)

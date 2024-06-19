@@ -16,8 +16,6 @@ void Laser::Update(float deltaTime)
     
     if (bounds.y < 0 || bounds.y > GetScreenHeight())
         isDestroyed = true;    
-    else
-        isDestroyed = false;
 }
 
 void Laser::Draw()

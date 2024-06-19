@@ -87,7 +87,7 @@ void AliensMovement(float deltaTime)
         {
             shouldChangeVelocity = true;
             shouldAliensGoDown = true;
-            
+
             break;
         }
     }
@@ -137,6 +137,11 @@ void CheckCollisionBetweenStructureAndLaser(Laser &laser)
             PlaySound(explosionSound);
         }
     }
+}
+
+void removingDestroyedElements() 
+{
+
 }
 
 void Update()
@@ -238,6 +243,8 @@ void Update()
         CheckCollisionBetweenStructureAndLaser(laser);
     }
 
+    AliensMovement(deltaTime);
+
     for (auto iterator = aliens.begin(); iterator != aliens.end();)
     {
         if (iterator->isDestroyed)
@@ -278,7 +285,6 @@ void Update()
         }
     }
 
-    AliensMovement(deltaTime);
 }
 
 void Draw()

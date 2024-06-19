@@ -10,8 +10,7 @@
 const int screenWidth = 750;
 const int screenHeight = 700;
 
-bool shouldAliensGoLeft;
-bool shouldAliensGoRight = true;
+bool shouldChangeVelocity;
 bool shouldAliensGoDown = false;
 
 float lastTimePlayerShoot;
@@ -84,37 +83,23 @@ void AliensMovement(float deltaTime)
     {
         float alienPosition = alien.bounds.x + alien.bounds.width;
 
-        if (!shouldAliensGoLeft && alienPosition > screenWidth)
+        if ((!shouldChangeVelocity && alienPosition > screenWidth) || alienPosition < alien.bounds.width)
         {
-            shouldAliensGoLeft = true;
-            shouldAliensGoRight = false;
+            shouldChangeVelocity = true;
             shouldAliensGoDown = true;
-            break;
-        }
-
-        if (!shouldAliensGoRight && alienPosition < alien.bounds.width)
-        {
-            shouldAliensGoRight = true;
-            shouldAliensGoLeft = false;
-            shouldAliensGoDown = true;
+            
             break;
         }
     }
 
-    if (shouldAliensGoLeft)
+    if (shouldChangeVelocity)
     {
         for (Alien &alien : aliens)
         {
-            alien.velocity = -50;
+            alien.velocity *= -1;
         }
-    }
 
-    if (shouldAliensGoRight)
-    {
-        for (Alien &alien : aliens)
-        {
-            alien.velocity = 50;
-        }
+        shouldChangeVelocity = false;
     }
 
     if (shouldAliensGoDown)

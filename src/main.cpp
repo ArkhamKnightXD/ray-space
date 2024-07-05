@@ -10,6 +10,8 @@
 const int screenWidth = 750;
 const int screenHeight = 700;
 
+bool isGamePaused;
+
 bool shouldChangeVelocity;
 bool shouldAliensGoDown = false;
 
@@ -137,11 +139,6 @@ void CheckCollisionBetweenStructureAndLaser(Laser &laser)
             PlaySound(explosionSound);
         }
     }
-}
-
-void removingDestroyedElements() 
-{
-
 }
 
 void Update()
@@ -284,7 +281,6 @@ void Update()
             iterator++;
         }
     }
-
 }
 
 void Draw()
@@ -295,6 +291,11 @@ void Draw()
 
     DrawText(TextFormat("Score: %i", player->score), 150, 10, 20, WHITE);
     DrawText(TextFormat("Lives %i", player->lives), screenWidth - 250, 10, 20, WHITE);
+
+    if (isGamePaused)
+    {
+        DrawText("Game Paused", screenWidth / 2 - 100, 40, 32, WHITE);
+    }
 
     mysteryShip->Draw();
 
@@ -333,10 +334,12 @@ int main()
 
     aliens = CreateAliens();
 
-    structures.push_back(Structure(screenWidth / 2 - 300, 550));
-    structures.push_back(Structure(screenWidth / 2 - 125, 550));
-    structures.push_back(Structure(screenWidth / 2 + 50, 550));
-    structures.push_back(Structure(screenWidth / 2 + 250, 550));
+    Texture2D structureSprite = LoadTexture("assets/sprites/structure.png");
+
+    structures.push_back(Structure(screenWidth / 2 - 300, 550, structureSprite));
+    structures.push_back(Structure(screenWidth / 2 - 125, 550, structureSprite));
+    structures.push_back(Structure(screenWidth / 2 + 50, 550, structureSprite));
+    structures.push_back(Structure(screenWidth / 2 + 250, 550, structureSprite));
 
     player = new Player(screenWidth / 2, screenHeight - 44);
 
@@ -344,10 +347,21 @@ int main()
 
     shootSound = LoadSound("assets/sounds/laser.ogg");
     explosionSound = LoadSound("assets/sounds/explosion.ogg");
+    Sound pauseSound = LoadSound("assets/sounds/magic.wav");
 
     while (!WindowShouldClose())
     {
-        Update();
+        if (IsKeyPressed(KEY_ENTER))
+        {
+            isGamePaused = !isGamePaused;
+            PlaySound(pauseSound);
+        }
+
+        if (!isGamePaused)
+        {
+            Update();
+        }
+
         Draw();
     }
 

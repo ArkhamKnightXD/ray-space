@@ -5,7 +5,7 @@
 class Structure
 {
 public:
-    Structure(float positionX, float positionY);
+    Structure(float positionX, float positionY, Texture2D textureSprite);
     void Draw();
 
 private:

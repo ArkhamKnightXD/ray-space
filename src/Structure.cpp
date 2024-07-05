@@ -1,8 +1,8 @@
 #include "Structure.h"
 
-Structure::Structure(float positionX, float positionY)
+Structure::Structure(float positionX, float positionY, Texture2D textureSprite)
 {
-    sprite = LoadTexture("assets/sprites/structure.png");
+    sprite = textureSprite;
     bounds = Rectangle{positionX, positionY, (float)sprite.width, (float)sprite.height};
 
     lives = 5;

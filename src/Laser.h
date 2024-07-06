@@ -6,7 +6,7 @@ class Laser
 {
 public:
     Laser(float positionX, float positionY, bool isAlienLaser);
-    void Update(float deltaTime);
+    void CheckIfShouldBeDestroy();
     void Draw();
 
 private:

@@ -13,7 +13,6 @@ const int screenHeight = 700;
 bool isGamePaused;
 
 bool shouldChangeVelocity;
-bool shouldAliensGoDown = false;
 
 float lastTimePlayerShoot;
 float lastTimeAlienShoot;
@@ -21,6 +20,7 @@ float lastTimeMysteryShipSpawn;
 
 Sound shootSound;
 Sound explosionSound;
+Sound pauseSound;
 
 // To initialize objects outside of the main it's necessary to define the objects as pointers.
 MysteryShip *mysteryShip = nullptr;
@@ -30,6 +30,34 @@ std::vector<Alien> aliens;
 std::vector<Structure> structures;
 std::vector<Laser> playerLasers;
 std::vector<Laser> alienLasers;
+
+Texture2D structureSprite;
+Texture2D alienSprite1;
+Texture2D alienSprite2;
+Texture2D alienSprite3;
+
+void QuitGame()
+{
+    // If I define objects as a pointer I need to later fr
+    delete player;    // Deletes the allocated memory for player
+    player = nullptr; // Resets the pointer to nullptr
+
+    delete mysteryShip;
+    mysteryShip = nullptr;
+
+    UnloadTexture(structureSprite);
+    UnloadTexture(alienSprite1);
+    UnloadTexture(alienSprite2);
+    UnloadTexture(alienSprite3);
+
+    // Unload all sprites.
+    UnloadSound(shootSound);
+    UnloadSound(explosionSound);
+    UnloadSound(pauseSound);
+    CloseAudioDevice();
+
+    CloseWindow();
+}
 
 std::vector<Alien> CreateAliens()
 {
@@ -52,18 +80,17 @@ std::vector<Alien> CreateAliens()
 
         switch (row)
         {
+            case 0:
+                actualSprite = alienSprite3;
+                break;
 
-        case 0:
-            actualSprite = alienSprite3;
-            break;
+            case 1:
+            case 2:
+                actualSprite = alienSprite2;
+                break;
 
-        case 1:
-        case 2:
-            actualSprite = alienSprite2;
-            break;
-
-        default:
-            actualSprite = alienSprite1;
+            default:
+                actualSprite = alienSprite1;
         }
 
         for (int columns = 0; columns < 11; columns++)
@@ -83,13 +110,13 @@ void AliensMovement(float deltaTime)
 {
     for (Alien &alien : aliens)
     {
+        alien.Update(deltaTime);
+
         float alienPosition = alien.bounds.x + alien.bounds.width;
 
         if ((!shouldChangeVelocity && alienPosition > screenWidth) || alienPosition < alien.bounds.width)
         {
             shouldChangeVelocity = true;
-            shouldAliensGoDown = true;
-
             break;
         }
     }
@@ -99,24 +126,10 @@ void AliensMovement(float deltaTime)
         for (Alien &alien : aliens)
         {
             alien.velocity *= -1;
-        }
-
-        shouldChangeVelocity = false;
-    }
-
-    if (shouldAliensGoDown)
-    {
-        for (Alien &alien : aliens)
-        {
             alien.bounds.y += 10;
         }
 
-        shouldAliensGoDown = false;
-    }
-
-    for (Alien &alien : aliens)
-    {
-        alien.Update(deltaTime);
+        shouldChangeVelocity = false;
     }
 }
 
@@ -137,6 +150,8 @@ void CheckCollisionBetweenStructureAndLaser(Laser &laser)
             }
 
             PlaySound(explosionSound);
+
+            break;
         }
     }
 }
@@ -173,13 +188,7 @@ void Update()
         }
     }
 
-    // When I have to change state of the object with a ranged based loop I need to use & if not the state of the object won't change
-    for (Laser &laser : playerLasers)
-    {
-        laser.Update(deltaTime);
-    }
-
-    // Alien lasers
+    // Alien lasers instantiation
     if (!aliens.empty() && GetTime() - lastTimeAlienShoot >= 0.6)
     {
         int randomAlienIndex = GetRandomValue(0, aliens.size() - 1);
@@ -194,11 +203,32 @@ void Update()
 
     for (Laser &laser : alienLasers)
     {
-        laser.Update(deltaTime);
+        laser.bounds.y += 400 * deltaTime;
+        laser.CheckIfShouldBeDestroy();
+
+        if (laser.bounds.y < 0 || laser.bounds.y > GetScreenHeight())
+            laser.isDestroyed = true;
+
+        if (player->lives > 0 && CheckCollisionRecs(player->bounds, laser.bounds))
+        {
+            laser.isDestroyed = true;
+
+            player->lives--;
+
+            PlaySound(explosionSound);
+
+            break;
+        }
+
+        CheckCollisionBetweenStructureAndLaser(laser);
     }
 
+    // When I have to change state of the object with a ranged based loop I need to use & if not the state of the object won't change
     for (Laser &laser : playerLasers)
     {
+        laser.bounds.y -= 400 * deltaTime;
+        laser.CheckIfShouldBeDestroy();
+
         if (!mysteryShip->isDestroyed && CheckCollisionRecs(mysteryShip->bounds, laser.bounds))
         {
             laser.isDestroyed = true;
@@ -208,6 +238,8 @@ void Update()
             mysteryShip->isDestroyed = true;
 
             PlaySound(explosionSound);
+
+            break;
         }
 
         for (Alien &alien : aliens)
@@ -220,21 +252,9 @@ void Update()
                 player->score += alien.points;
 
                 PlaySound(explosionSound);
+
+                break;
             }
-        }
-
-        CheckCollisionBetweenStructureAndLaser(laser);
-    }
-
-    for (Laser &laser : alienLasers)
-    {
-        if (player->lives > 0 && CheckCollisionRecs(player->bounds, laser.bounds))
-        {
-            laser.isDestroyed = true;
-
-            player->lives--;
-
-            PlaySound(explosionSound);
         }
 
         CheckCollisionBetweenStructureAndLaser(laser);
@@ -334,7 +354,7 @@ int main()
 
     aliens = CreateAliens();
 
-    Texture2D structureSprite = LoadTexture("assets/sprites/structure.png");
+    structureSprite = LoadTexture("assets/sprites/structure.png");
 
     structures.push_back(Structure(screenWidth / 2 - 300, 550, structureSprite));
     structures.push_back(Structure(screenWidth / 2 - 125, 550, structureSprite));
@@ -347,10 +367,15 @@ int main()
 
     shootSound = LoadSound("assets/sounds/laser.ogg");
     explosionSound = LoadSound("assets/sounds/explosion.ogg");
-    Sound pauseSound = LoadSound("assets/sounds/magic.wav");
+    pauseSound = LoadSound("assets/sounds/magic.wav");
 
     while (!WindowShouldClose())
     {
+        if (IsKeyPressed(KEY_ESCAPE))
+        {
+            break;
+        }
+
         if (IsKeyPressed(KEY_ENTER))
         {
             isGamePaused = !isGamePaused;
@@ -365,15 +390,5 @@ int main()
         Draw();
     }
 
-    // If I define objects as a pointer I need to later fr
-    delete player;    // Deletes the allocated memory for player
-    player = nullptr; // Resets the pointer to nullptr
-
-    delete mysteryShip;
-    mysteryShip = nullptr;
-    // Unload all sprites.
-    UnloadSound(shootSound);
-    UnloadSound(explosionSound);
-    CloseAudioDevice();
-    CloseWindow();
+    QuitGame();
 }

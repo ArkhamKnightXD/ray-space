@@ -4,7 +4,6 @@
 #include "Player.h"
 #include "Alien.h"
 #include "MysteryShip.h"
-#include "Laser.h"
 #include "Structure.h"
 
 const int screenWidth = 750;
@@ -28,6 +27,13 @@ Player *player = nullptr;
 
 std::vector<Alien> aliens;
 std::vector<Structure> structures;
+
+typedef struct
+{
+    Rectangle bounds;
+    bool isDestroyed;
+} Laser;
+
 std::vector<Laser> playerLasers;
 std::vector<Laser> alienLasers;
 
@@ -156,112 +162,8 @@ void CheckCollisionBetweenStructureAndLaser(Laser &laser)
     }
 }
 
-void Update()
+void RemoveDestroyedElements()
 {
-    float deltaTime = GetFrameTime();
-
-    player->Update(deltaTime);
-
-    if (!mysteryShip->shouldMove)
-    {
-        lastTimeMysteryShipSpawn += deltaTime;
-
-        if (lastTimeMysteryShipSpawn >= 10)
-        {
-            lastTimeMysteryShipSpawn = 0;
-
-            mysteryShip->shouldMove = true;
-        }
-    }
-
-    mysteryShip->Update(deltaTime);
-
-    if (IsKeyDown(KEY_SPACE))
-    {
-        // shoot one laser every 350 ms
-        if (GetTime() - lastTimePlayerShoot >= 0.5)
-        {
-            playerLasers.push_back(Laser(player->bounds.x + 20, player->bounds.y - player->bounds.height, false));
-            lastTimePlayerShoot = GetTime();
-
-            PlaySound(shootSound);
-        }
-    }
-
-    // Alien lasers instantiation
-    if (!aliens.empty() && GetTime() - lastTimeAlienShoot >= 0.6)
-    {
-        int randomAlienIndex = GetRandomValue(0, aliens.size() - 1);
-
-        Alien alien = aliens[randomAlienIndex];
-
-        alienLasers.push_back(Laser(alien.bounds.x + 20, alien.bounds.y + alien.bounds.height, true));
-        lastTimeAlienShoot = GetTime();
-
-        PlaySound(shootSound);
-    }
-
-    for (Laser &laser : alienLasers)
-    {
-        laser.bounds.y += 400 * deltaTime;
-        laser.CheckIfShouldBeDestroy();
-
-        if (laser.bounds.y < 0 || laser.bounds.y > GetScreenHeight())
-            laser.isDestroyed = true;
-
-        if (player->lives > 0 && CheckCollisionRecs(player->bounds, laser.bounds))
-        {
-            laser.isDestroyed = true;
-
-            player->lives--;
-
-            PlaySound(explosionSound);
-
-            break;
-        }
-
-        CheckCollisionBetweenStructureAndLaser(laser);
-    }
-
-    // When I have to change state of the object with a ranged based loop I need to use & if not the state of the object won't change
-    for (Laser &laser : playerLasers)
-    {
-        laser.bounds.y -= 400 * deltaTime;
-        laser.CheckIfShouldBeDestroy();
-
-        if (!mysteryShip->isDestroyed && CheckCollisionRecs(mysteryShip->bounds, laser.bounds))
-        {
-            laser.isDestroyed = true;
-
-            player->score += mysteryShip->points;
-
-            mysteryShip->isDestroyed = true;
-
-            PlaySound(explosionSound);
-
-            break;
-        }
-
-        for (Alien &alien : aliens)
-        {
-            if (!alien.isDestroyed && CheckCollisionRecs(alien.bounds, laser.bounds))
-            {
-                alien.isDestroyed = true;
-                laser.isDestroyed = true;
-
-                player->score += alien.points;
-
-                PlaySound(explosionSound);
-
-                break;
-            }
-        }
-
-        CheckCollisionBetweenStructureAndLaser(laser);
-    }
-
-    AliensMovement(deltaTime);
-
     for (auto iterator = aliens.begin(); iterator != aliens.end();)
     {
         if (iterator->isDestroyed)
@@ -303,6 +205,123 @@ void Update()
     }
 }
 
+void Update()
+{
+    float deltaTime = GetFrameTime();
+
+    player->Update(deltaTime);
+
+    if (!mysteryShip->shouldMove)
+    {
+        lastTimeMysteryShipSpawn += deltaTime;
+
+        if (lastTimeMysteryShipSpawn >= 10)
+        {
+            lastTimeMysteryShipSpawn = 0;
+
+            mysteryShip->shouldMove = true;
+        }
+    }
+
+    mysteryShip->Update(deltaTime);
+
+    if (IsKeyDown(KEY_SPACE))
+    {
+        // shoot one laser every 350 ms
+        if (GetTime() - lastTimePlayerShoot >= 0.5)
+        {
+            Rectangle laserBounds = {player->bounds.x + 20, player->bounds.y - player->bounds.height, 4, 16};
+            playerLasers.push_back({laserBounds, false});
+
+            lastTimePlayerShoot = GetTime();
+
+            PlaySound(shootSound);
+        }
+    }
+
+    // Alien lasers instantiation
+    if (!aliens.empty() && GetTime() - lastTimeAlienShoot >= 0.6)
+    {
+        int randomAlienIndex = GetRandomValue(0, aliens.size() - 1);
+
+        Alien alien = aliens[randomAlienIndex];
+
+        Rectangle laserBounds = {alien.bounds.x + 20, alien.bounds.y + alien.bounds.height, 4, 16};
+
+        alienLasers.push_back({laserBounds, false});
+        lastTimeAlienShoot = GetTime();
+
+        PlaySound(shootSound);
+    }
+
+    for (Laser &laser : alienLasers)
+    {
+        laser.bounds.y += 400 * deltaTime;
+
+        if (laser.bounds.y > GetScreenHeight())
+            laser.isDestroyed = true;
+
+        if (laser.bounds.y < 0 || laser.bounds.y > GetScreenHeight())
+            laser.isDestroyed = true;
+
+        if (player->lives > 0 && CheckCollisionRecs(player->bounds, laser.bounds))
+        {
+            laser.isDestroyed = true;
+
+            player->lives--;
+
+            PlaySound(explosionSound);
+
+            break;
+        }
+
+        CheckCollisionBetweenStructureAndLaser(laser);
+    }
+
+    // When I have to change state of the object with a ranged based loop I need to use & if not the state of the object won't change
+    for (Laser &laser : playerLasers)
+    {
+        laser.bounds.y -= 400 * deltaTime;
+
+        if (laser.bounds.y < 0)
+            laser.isDestroyed = true;
+
+        if (!mysteryShip->isDestroyed && CheckCollisionRecs(mysteryShip->bounds, laser.bounds))
+        {
+            laser.isDestroyed = true;
+
+            player->score += mysteryShip->points;
+
+            mysteryShip->isDestroyed = true;
+
+            PlaySound(explosionSound);
+
+            break;
+        }
+
+        for (Alien &alien : aliens)
+        {
+            if (!alien.isDestroyed && CheckCollisionRecs(alien.bounds, laser.bounds))
+            {
+                alien.isDestroyed = true;
+                laser.isDestroyed = true;
+
+                player->score += alien.points;
+
+                PlaySound(explosionSound);
+
+                break;
+            }
+        }
+
+        CheckCollisionBetweenStructureAndLaser(laser);
+    }
+
+    AliensMovement(deltaTime);
+
+    RemoveDestroyedElements();
+}
+
 void Draw()
 {
     BeginDrawing();
@@ -326,7 +345,11 @@ void Draw()
 
     for (Laser laser : alienLasers)
     {
-        laser.Draw();
+        if (!laser.isDestroyed)
+        {
+            DrawRectangleRec(laser.bounds, {243, 216, 63, 255});
+        }
+        
     }
 
     for (Structure structure : structures)
@@ -336,7 +359,10 @@ void Draw()
 
     for (Laser laser : playerLasers)
     {
-        laser.Draw();
+        if (!laser.isDestroyed)
+        {
+            DrawRectangleRec(laser.bounds, {243, 216, 63, 255});
+        }
     }
 
     player->Draw();

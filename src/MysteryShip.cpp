@@ -7,7 +7,7 @@ MysteryShip::MysteryShip(float positionX, float positionY)
     bounds = Rectangle{positionX, positionY, (float)sprite.width, (float)sprite.height};
 
     points = 50;
-    velocityX = -100;
+    velocityX = -200;
     isDestroyed = false;
     shouldMove = false;
 }

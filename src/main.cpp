@@ -17,6 +17,7 @@ float lastTimePlayerShoot;
 float lastTimeAlienShoot;
 float lastTimeMysteryShipSpawn;
 
+Music music;
 Sound shootSound;
 Sound explosionSound;
 Sound pauseSound;
@@ -395,8 +396,15 @@ int main()
     explosionSound = LoadSound("assets/sounds/explosion.ogg");
     pauseSound = LoadSound("assets/sounds/magic.wav");
 
+    music = LoadMusicStream("assets/music/music.ogg");
+    music.looping = true;
+
+    PlayMusicStream(music);
+
     while (!WindowShouldClose())
     {
+        UpdateMusicStream(music);
+
         if (IsKeyPressed(KEY_ESCAPE))
         {
             break;

@@ -392,11 +392,11 @@ int main()
 
     InitAudioDevice();
 
-    shootSound = LoadSound("assets/sounds/laser.ogg");
-    explosionSound = LoadSound("assets/sounds/explosion.ogg");
+    shootSound = LoadSound("assets/sounds/laser.wav");
+    explosionSound = LoadSound("assets/sounds/explosion.wav");
     pauseSound = LoadSound("assets/sounds/magic.wav");
 
-    music = LoadMusicStream("assets/music/music.ogg");
+    music = LoadMusicStream("assets/music/music.wav");
     music.looping = true;
 
     PlayMusicStream(music);
